@@ -7,17 +7,13 @@ search.addEventListener("click", function() {
     }
     let total_videos = 50; 
     fetch(`https://www.googleapis.com/youtube/v3/search?key=AIzaSyB-iBBIztlKJKVd2KE8zLGtVnkezHDYbAY&type=video&part=snippet&maxResults=${total_videos}&q=${input}`)
-    //fetch(`./s1.json`)
     .then(res => res.json())
     .then(res => {
-        //renderVideos(res.items)
         let ids = [];
         for (let video of res.items) {
             ids.push(video.id.videoId);
         }
-        console.log(ids);
         fetch(`https://www.googleapis.com/youtube/v3/videos?key=AIzaSyB-iBBIztlKJKVd2KE8zLGtVnkezHDYbAY&id=${ids.join(',')}&part=snippet,statistics`)
-        // fetch(`./s2.json`)  
         .then(data => data.json())
         .then(data => {
             console.log(data);
@@ -25,7 +21,13 @@ search.addEventListener("click", function() {
         });
     });
 })
-
+function videoDet(){
+    let counter = 1;
+    document.querySelector(".videos-listing").innerHTML = '';
+    for (let video of videos) {
+        videoDetails(video,counter++);
+    }
+}
 function renderVideos(videoData,total_videos) {
     let videos_per_page = 15;
     let no_of_pages = Math.ceil(total_videos / videos_per_page);
@@ -33,27 +35,16 @@ function renderVideos(videoData,total_videos) {
     pagination(no_of_pages);
     
     let videos = videoData.slice(0,videos_per_page);
-    let i = 1;
-    document.querySelector(".videos-listing").innerHTML = '';
-    for (let video of videos) {
-        videoDetails(video,i++);
-    }
+    videoDet();
 
     let pages = document.querySelectorAll(".page-btn");
     for(let page of pages){
-        //console.log(page);
         page.addEventListener("click",function(){
             let pageNo = this.innerHTML;
-            let start = (pageNo - 1) * videos_per_page;//0*15=0, 1*15=15
-            let end = start + videos_per_page; //0+15=15; 15+15=30
-           // console.log(videoData);
-            let videos = videoData.slice(start,end);//0-14
-            //console.log(videos);
-            let i = 1;
-            document.querySelector(".videos-listing").innerHTML = '';
-            for (let video of videos) {
-                videoDetails(video,i++);
-            }
+            let start = (pageNo - 1) * videos_per_page;
+            let end = start + videos_per_page;
+            let videos = videoData.slice(start,end);
+           videoDet();
        });
     }
 }
